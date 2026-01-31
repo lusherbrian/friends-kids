@@ -16,6 +16,11 @@ export interface Kid {
   name: string
   birthdate: string
   reminder_enabled: boolean
+  rsvp_status: 'yes' | 'no' | 'n/a'
+  gift_bought: 'yes' | 'no' | 'n/a'
+  texted_hb: boolean
+  gift_notes?: string
+  age_at_next_birthday?: number
   created_at: string
   updated_at: string
 }
@@ -36,7 +41,11 @@ export interface Party {
   id: string
   kid_id: string
   party_date: string
+  party_time?: string
   location?: string
+  theme?: string
+  plus_one_allowed: boolean
+  directions?: string
   notes?: string
   gift_purchased: boolean
   created_at: string

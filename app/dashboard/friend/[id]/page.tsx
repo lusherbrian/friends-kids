@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase'
-import { useRouter, useParams } from 'next/navigation'
-import { Friend, Kid, Gift, Party } from '@/types/database'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
+import { Friend, Kid } from '@/types/database'
 import { format, parseISO } from 'date-fns'
 
 export default function FriendDetailPage() {
@@ -11,12 +11,19 @@ export default function FriendDetailPage() {
   const [kids, setKids] = useState<Kid[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddKid, setShowAddKid] = useState(false)
+  const [editingGiftNotes, setEditingGiftNotes] = useState<string | null>(null)
   const router = useRouter()
   const params = useParams()
+  const searchParams = useSearchParams()
   const supabase = createBrowserClient()
 
   useEffect(() => {
     fetchFriendData()
+    
+    // Check if we should auto-open add kid modal (from pregnancy "Baby Born")
+    if (searchParams.get('addKid') === 'true') {
+      setShowAddKid(true)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
@@ -60,6 +67,23 @@ export default function FriendDetailPage() {
     } catch (error) {
       console.error('Error deleting kid:', error)
       alert('Error deleting kid')
+    }
+  }
+
+  const saveGiftNotes = async (kidId: string, notes: string) => {
+    try {
+      const { error } = await supabase
+        .from('kids')
+        .update({ gift_notes: notes || null })
+        .eq('id', kidId)
+
+      if (error) throw error
+      
+      setKids(kids.map(k => k.id === kidId ? { ...k, gift_notes: notes } : k))
+      setEditingGiftNotes(null)
+    } catch (error) {
+      console.error('Error saving gift notes:', error)
+      alert('Error saving gift notes')
     }
   }
 
@@ -155,32 +179,30 @@ export default function FriendDetailPage() {
               {kids.map(kid => {
                 const birthDate = parseISO(kid.birthdate)
                 const age = new Date().getFullYear() - birthDate.getFullYear()
+                const isMilestone = kid.age_at_next_birthday && [1, 5, 10, 13, 16, 18, 21].includes(kid.age_at_next_birthday)
                 
                 return (
                   <div
                     key={kid.id}
-                    className="border border-gray-200 rounded-lg p-4"
+                    className="border-2 border-gray-100 rounded-lg p-4 hover:border-blue-200 transition-colors"
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {kid.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{kid.name}</h3>
+                          {isMilestone && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                              🎉 Milestone: {kid.age_at_next_birthday}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">
                           Birthday: {format(birthDate, 'MMMM d, yyyy')}
                         </p>
                         <p className="text-sm text-gray-600">
-                          Age: {age} years old
+                          Current Age: {age} years old
+                          {kid.age_at_next_birthday && ` • Turning ${kid.age_at_next_birthday}`}
                         </p>
-                        <div className="mt-2">
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs ${
-                            kid.reminder_enabled 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-gray-100 text-gray-700'
-                          }`}>
-                            {kid.reminder_enabled ? '🔔 Reminders On' : '🔕 Reminders Off'}
-                          </span>
-                        </div>
                       </div>
                       <button
                         onClick={() => handleDeleteKid(kid.id)}
@@ -188,6 +210,84 @@ export default function FriendDetailPage() {
                       >
                         Delete
                       </button>
+                    </div>
+
+                    {/* Gift Notes Section */}
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex items-start justify-between mb-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          💡 Gift Ideas & Notes:
+                        </label>
+                        {editingGiftNotes !== kid.id && (
+                          <button
+                            onClick={() => setEditingGiftNotes(kid.id)}
+                            className="text-xs text-blue-600 hover:text-blue-700"
+                          >
+                            {kid.gift_notes ? 'Edit' : 'Add Notes'}
+                          </button>
+                        )}
+                      </div>
+                      
+                      {editingGiftNotes === kid.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            defaultValue={kid.gift_notes || ''}
+                            id={`notes-${kid.id}`}
+                            rows={3}
+                            placeholder="E.g., Loves dinosaurs, wants Lego sets, already has blue bike..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                const textarea = document.getElementById(`notes-${kid.id}`) as HTMLTextAreaElement
+                                saveGiftNotes(kid.id, textarea.value)
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingGiftNotes(null)}
+                              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-600 italic">
+                          {kid.gift_notes || 'No gift notes yet'}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Tracking Status */}
+                    <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        kid.reminder_enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {kid.reminder_enabled ? '🔔 Reminders On' : '🔕 Reminders Off'}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        kid.rsvp_status === 'yes' ? 'bg-green-100 text-green-700' :
+                        kid.rsvp_status === 'no' ? 'bg-red-100 text-red-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        RSVP: {kid.rsvp_status === 'yes' ? '✓ Yes' : kid.rsvp_status === 'no' ? '✗ No' : '— N/A'}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        kid.gift_bought === 'yes' ? 'bg-blue-100 text-blue-700' :
+                        kid.gift_bought === 'no' ? 'bg-orange-100 text-orange-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        Gift: {kid.gift_bought === 'yes' ? '✓ Bought' : kid.gift_bought === 'no' ? '✗ Not Yet' : '— N/A'}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        kid.texted_hb ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {kid.texted_hb ? '✓ Texted HB' : '— Not Texted'}
+                      </span>
                     </div>
                   </div>
                 )
@@ -205,6 +305,19 @@ export default function FriendDetailPage() {
           onSuccess={() => {
             setShowAddKid(false)
             fetchFriendData()
+            
+            // If coming from pregnancy, mark it as born
+            const pregnancyId = searchParams.get('fromPregnancy')
+            if (pregnancyId) {
+              supabase
+                .from('pregnancies')
+                .update({ baby_born: true, birth_date: new Date().toISOString().split('T')[0] })
+                .eq('id', pregnancyId)
+                .then(() => {
+                  // Redirect back without query params
+                  router.push(`/dashboard/friend/${friend.id}`)
+                })
+            }
           }}
         />
       )}
@@ -224,6 +337,7 @@ function AddKidModal({
   const [name, setName] = useState('')
   const [birthdate, setBirthdate] = useState('')
   const [reminderEnabled, setReminderEnabled] = useState(true)
+  const [giftNotes, setGiftNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const supabase = createBrowserClient()
 
@@ -239,7 +353,11 @@ function AddKidModal({
             friend_id: friendId,
             name,
             birthdate,
-            reminder_enabled: reminderEnabled
+            reminder_enabled: reminderEnabled,
+            gift_notes: giftNotes || null,
+            rsvp_status: 'n/a',
+            gift_bought: 'n/a',
+            texted_hb: false
           }
         ])
 
@@ -256,7 +374,7 @@ function AddKidModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Kid</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -280,6 +398,18 @@ function AddKidModal({
               value={birthdate}
               onChange={(e) => setBirthdate(e.target.value)}
               required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gift Ideas & Notes
+            </label>
+            <textarea
+              value={giftNotes}
+              onChange={(e) => setGiftNotes(e.target.value)}
+              rows={3}
+              placeholder="E.g., Loves dinosaurs, wants Lego sets..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
