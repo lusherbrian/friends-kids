@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [filterOption, setFilterOption] = useState('all')
   const [showAddFriend, setShowAddFriend] = useState(false)
   const [showAddPregnancy, setShowAddPregnancy] = useState(false)
+  const [editingFriend, setEditingFriend] = useState<Friend | null>(null)
   const router = useRouter()
   const supabase = createBrowserClient()
 
@@ -165,24 +166,29 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+        <div className="text-lg font-semibold text-purple-600">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50">
+      {/* Header - Enhanced */}
+      <header className="bg-white shadow-md border-b-2 border-purple-200 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Friends Kids 🎂</h1>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🎉</span>
+              <h1 className="text-xl md:text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Friends Kids
+              </h1>
+            </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600 hidden sm:inline">{user?.email}</span>
               <button
                 onClick={handleSignOut}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-sm text-purple-600 hover:text-purple-800 font-semibold"
               >
                 Sign Out
               </button>
@@ -192,16 +198,16 @@ export default function Dashboard() {
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        {/* Pregnant Friends Section */}
+        {/* Pregnant Friends Section - Enhanced */}
         {pregnancies.length > 0 && (
-          <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 md:p-6 mb-6 border-2 border-pink-200">
+          <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-2xl p-4 md:p-6 mb-6 border-2 border-pink-300 shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg md:text-xl font-bold text-pink-900 flex items-center gap-2">
+              <h2 className="text-lg md:text-xl font-black text-pink-900 flex items-center gap-2">
                 🤰 Expecting Friends
               </h2>
               <button
                 onClick={() => setShowAddPregnancy(true)}
-                className="text-pink-700 hover:text-pink-900 text-sm font-medium"
+                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all"
               >
                 + Add
               </button>
@@ -210,25 +216,25 @@ export default function Dashboard() {
               {pregnancies.map(pregnancy => {
                 const daysUntil = differenceInDays(parseISO(pregnancy.due_date), new Date())
                 return (
-                  <div key={pregnancy.id} className="bg-white rounded-lg p-4 shadow-sm">
+                  <div key={pregnancy.id} className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{pregnancy.friends?.name}</h3>
+                        <h3 className="font-bold text-lg text-gray-900">{pregnancy.friends?.name}</h3>
                         <p className="text-sm text-gray-600">
                           Due: {format(parseISO(pregnancy.due_date), 'MMMM d, yyyy')}
                         </p>
                         {pregnancy.notes && (
-                          <p className="text-sm text-gray-500 mt-1">{pregnancy.notes}</p>
+                          <p className="text-sm text-purple-600 mt-1 italic">{pregnancy.notes}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-pink-600">{daysUntil}</div>
-                          <div className="text-xs text-gray-500">days until</div>
+                        <div className="text-center bg-pink-100 rounded-xl px-4 py-2">
+                          <div className="text-3xl font-black text-pink-600">{daysUntil}</div>
+                          <div className="text-xs text-gray-600 font-semibold">days until</div>
                         </div>
                         <button
                           onClick={() => handleBabyBorn(pregnancy)}
-                          className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                          className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg whitespace-nowrap"
                         >
                           🍼 Baby Born
                         </button>
@@ -241,101 +247,101 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        {/* Search and Filters - Enhanced */}
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 border-2 border-purple-100">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Search kids or friends..."
+                placeholder="🔍 Search kids or friends..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-medium"
               />
             </div>
             <select
               value={filterOption}
               onChange={(e) => setFilterOption(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-medium"
             >
               <option value="all">All Kids</option>
-              <option value="this-month">Birthdays This Month</option>
-              <option value="milestones">Milestone Birthdays</option>
-              <option value="pending-rsvp">Pending RSVP</option>
-              <option value="no-gift">No Gift Yet</option>
-              <option value="not-texted">Haven&apos;t Texted (Within 7 Days)</option>
+              <option value="this-month">🎂 Birthdays This Month</option>
+              <option value="milestones">🎉 Milestone Birthdays</option>
+              <option value="pending-rsvp">📝 Pending RSVP</option>
+              <option value="no-gift">🎁 No Gift Yet</option>
+              <option value="not-texted">💬 Haven&apos;t Texted (Within 7 Days)</option>
             </select>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowAddFriend(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all font-bold shadow-md hover:shadow-lg whitespace-nowrap"
               >
                 + Friend
               </button>
               <button
                 onClick={() => setShowAddPregnancy(true)}
-                className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors whitespace-nowrap"
+                className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-3 rounded-xl hover:from-pink-600 hover:to-rose-600 transition-all font-bold shadow-md hover:shadow-lg whitespace-nowrap"
               >
                 + Pregnancy
               </button>
             </div>
           </div>
-          <div className="mt-3 text-sm text-gray-600">
+          <div className="mt-3 text-sm text-purple-700 font-semibold">
             Showing {filteredKids.length} of {kids.length} kids
           </div>
         </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden lg:block bg-white rounded-xl shadow-lg overflow-hidden">
+        {/* Desktop Table View - Enhanced */}
+        <div className="hidden lg:block bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-purple-100">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b-2 border-gray-200">
+              <thead className="bg-gradient-to-r from-purple-100 to-pink-100 border-b-2 border-purple-200">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Kid / Friend</th>
-                  <th className="px-4 py-4 text-left text-sm font-semibold text-gray-900">Next Birthday</th>
-                  <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">Age</th>
-                  <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">Days</th>
-                  <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">RSVP</th>
-                  <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">Gift</th>
-                  <th className="px-4 py-4 text-center text-sm font-semibold text-gray-900">Texted</th>
+                  <th className="px-6 py-4 text-left text-sm font-black text-purple-900">Kid / Friend</th>
+                  <th className="px-4 py-4 text-left text-sm font-black text-purple-900">Next Birthday</th>
+                  <th className="px-4 py-4 text-center text-sm font-black text-purple-900">Age</th>
+                  <th className="px-4 py-4 text-center text-sm font-black text-purple-900">Days</th>
+                  <th className="px-4 py-4 text-center text-sm font-black text-purple-900">RSVP</th>
+                  <th className="px-4 py-4 text-center text-sm font-black text-purple-900">Gift</th>
+                  <th className="px-4 py-4 text-center text-sm font-black text-purple-900">Texted</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-purple-100">
                 {filteredKids.map((kid) => {
                   const isMilestone = kid.age_at_next_birthday && [1, 5, 10, 13, 16, 18, 21].includes(kid.age_at_next_birthday)
                   return (
                     <tr 
                       key={kid.id} 
-                      className="hover:bg-blue-50 transition-colors cursor-pointer"
+                      className="hover:bg-purple-50 transition-colors cursor-pointer"
                       onClick={() => router.push(`/dashboard/friend/${kid.friendId}`)}
                     >
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-gray-900">{kid.name}</div>
-                        <div className="text-sm text-gray-500">{kid.friendName}</div>
+                        <div className="font-bold text-gray-900">{kid.name}</div>
+                        <div className="text-sm text-purple-600 font-medium">{kid.friendName}</div>
                         {kid.gift_notes && (
-                          <div className="text-xs text-gray-400 mt-1 truncate max-w-xs">
+                          <div className="text-xs text-gray-500 mt-1 truncate max-w-xs">
                             💡 {kid.gift_notes}
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-4">
-                        <div className="text-sm">
+                        <div className="text-sm font-medium text-gray-700">
                           {format(kid.nextBirthday, 'MMM d, yyyy')}
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center">
                         {isMilestone ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800">
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-black bg-yellow-100 text-yellow-800 shadow-sm">
                             🎉 {kid.age_at_next_birthday}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-bold text-gray-700">
                             {kid.age_at_next_birthday}
                           </span>
                         )}
                       </td>
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-lg font-bold ${
+                        <span className={`text-xl font-black ${
                           kid.daysUntil <= 7 ? 'text-red-600' :
                           kid.daysUntil <= 30 ? 'text-orange-600' :
                           'text-gray-900'
@@ -347,7 +353,7 @@ export default function Dashboard() {
                         <select 
                           value={kid.rsvp_status}
                           onChange={(e) => updateKidField(kid.id, 'rsvp_status', e.target.value)}
-                          className="rounded-md border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5"
+                          className="rounded-lg border-2 border-purple-200 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 py-1.5 font-medium"
                         >
                           <option value="yes">✓ Yes</option>
                           <option value="no">✗ No</option>
@@ -358,7 +364,7 @@ export default function Dashboard() {
                         <select 
                           value={kid.gift_bought}
                           onChange={(e) => updateKidField(kid.id, 'gift_bought', e.target.value)}
-                          className="rounded-md border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500 py-1.5"
+                          className="rounded-lg border-2 border-purple-200 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 py-1.5 font-medium"
                         >
                           <option value="yes">✓ Yes</option>
                           <option value="no">✗ No</option>
@@ -370,7 +376,7 @@ export default function Dashboard() {
                           type="checkbox" 
                           checked={kid.texted_hb}
                           onChange={(e) => updateKidField(kid.id, 'texted_hb', e.target.checked)}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-5 h-5 text-purple-600 border-2 border-purple-300 rounded focus:ring-purple-500"
                         />
                       </td>
                     </tr>
@@ -386,22 +392,22 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Mobile Card View */}
+        {/* Mobile Card View - Enhanced */}
         <div className="lg:hidden space-y-4">
           {filteredKids.map((kid) => {
             const isMilestone = kid.age_at_next_birthday && [1, 5, 10, 13, 16, 18, 21].includes(kid.age_at_next_birthday)
             return (
               <div 
                 key={kid.id} 
-                className="bg-white rounded-xl shadow-md p-4"
+                className="bg-white rounded-2xl shadow-lg p-4 border-2 border-purple-100 hover:border-purple-300 transition-all"
                 onClick={() => router.push(`/dashboard/friend/${kid.friendId}`)}
               >
-                <div className="flex items-start justify-between mb-4 pb-3 border-b border-gray-100">
+                <div className="flex items-start justify-between mb-4 pb-3 border-b-2 border-purple-100">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">{kid.name}</h3>
-                    <p className="text-sm text-gray-600">{kid.friendName}</p>
+                    <h3 className="text-lg font-black text-gray-900">{kid.name}</h3>
+                    <p className="text-sm text-purple-600 font-semibold">{kid.friendName}</p>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm text-gray-700 font-medium">
                         {format(kid.nextBirthday, 'MMM d, yyyy')}
                       </p>
                       {kid.gift_notes && (
@@ -410,16 +416,16 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="text-center ml-4">
-                    <div className={`text-2xl font-bold ${
+                    <div className={`text-2xl font-black ${
                       kid.daysUntil <= 7 ? 'text-red-600' :
                       kid.daysUntil <= 30 ? 'text-orange-600' :
                       'text-gray-900'
                     }`}>
                       {kid.daysUntil}
                     </div>
-                    <div className="text-xs text-gray-500">days</div>
+                    <div className="text-xs text-gray-500 font-semibold">days</div>
                     {isMilestone && (
-                      <div className="mt-1 text-xs font-bold text-yellow-600">
+                      <div className="mt-1 text-xs font-black text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
                         🎉 {kid.age_at_next_birthday}
                       </div>
                     )}
@@ -428,11 +434,11 @@ export default function Dashboard() {
 
                 <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-700">RSVP:</label>
+                    <label className="text-sm font-bold text-gray-700">RSVP:</label>
                     <select 
                       value={kid.rsvp_status}
                       onChange={(e) => updateKidField(kid.id, 'rsvp_status', e.target.value)}
-                      className="rounded-md border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="rounded-lg border-2 border-purple-200 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-medium text-gray-900 bg-white px-3 py-2"
                     >
                       <option value="yes">✓ Yes</option>
                       <option value="no">✗ No</option>
@@ -441,11 +447,11 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-700">Gift:</label>
+                    <label className="text-sm font-bold text-gray-700">Gift:</label>
                     <select 
                       value={kid.gift_bought}
                       onChange={(e) => updateKidField(kid.id, 'gift_bought', e.target.value)}
-                      className="rounded-md border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                      className="rounded-lg border-2 border-purple-200 text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 font-medium text-gray-900 bg-white px-3 py-2"
                     >
                       <option value="yes">✓ Yes</option>
                       <option value="no">✗ No</option>
@@ -454,12 +460,12 @@ export default function Dashboard() {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-gray-700">Texted HB:</label>
+                    <label className="text-sm font-bold text-gray-700">Texted HB:</label>
                     <input 
                       type="checkbox" 
                       checked={kid.texted_hb}
                       onChange={(e) => updateKidField(kid.id, 'texted_hb', e.target.checked)}
-                      className="w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-7 h-7 text-purple-600 border-2 border-purple-300 rounded focus:ring-purple-500"
                     />
                   </div>
                 </div>
@@ -467,7 +473,7 @@ export default function Dashboard() {
             )
           })}
           {filteredKids.length === 0 && (
-            <div className="text-center py-12 text-gray-500 bg-white rounded-xl">
+            <div className="text-center py-12 text-gray-500 bg-white rounded-2xl border-2 border-purple-100">
               No kids found matching your filters
             </div>
           )}
@@ -492,6 +498,18 @@ export default function Dashboard() {
           onClose={() => setShowAddPregnancy(false)}
           onSuccess={() => {
             setShowAddPregnancy(false)
+            if (user) fetchAllData(user.id)
+          }}
+          userId={user?.id}
+        />
+      )}
+
+      {editingFriend && (
+        <EditFriendModal
+          friend={editingFriend}
+          onClose={() => setEditingFriend(null)}
+          onSuccess={() => {
+            setEditingFriend(null)
             if (user) fetchAllData(user.id)
           }}
         />
@@ -536,51 +554,141 @@ function AddFriendModal({ onClose, onSuccess, userId }: { onClose: () => void, o
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Friend</h2>
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border-2 border-purple-200">
+        <h2 className="text-2xl font-black text-gray-900 mb-4">Add Friend</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Name(s) *
+              <span className="text-xs font-normal text-gray-500 ml-2">(e.g., &quot;Sarah & Mike Johnson&quot;)</span>
+            </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Both parents improves searchability"
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Phone</label>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
             />
           </div>
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-bold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-colors disabled:opacity-50 font-bold shadow-md"
             >
               {loading ? 'Adding...' : 'Add Friend'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function EditFriendModal({ friend, onClose, onSuccess }: { friend: Friend, onClose: () => void, onSuccess: () => void }) {
+  const [name, setName] = useState(friend.name)
+  const [email, setEmail] = useState(friend.email || '')
+  const [phone, setPhone] = useState(friend.phone || '')
+  const [loading, setLoading] = useState(false)
+  const supabase = createBrowserClient()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const { error } = await supabase
+        .from('friends')
+        .update({
+          name,
+          email: email || null,
+          phone: phone || null,
+        })
+        .eq('id', friend.id)
+
+      if (error) throw error
+      onSuccess()
+    } catch (error) {
+      console.error('Error updating friend:', error)
+      alert('Error updating friend')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border-2 border-purple-200">
+        <h2 className="text-2xl font-black text-gray-900 mb-4">Edit Friend</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Name(s) *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white font-medium"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-bold"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-colors disabled:opacity-50 font-bold shadow-md"
+            >
+              {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -592,16 +700,20 @@ function AddFriendModal({ onClose, onSuccess, userId }: { onClose: () => void, o
 function AddPregnancyModal({ 
   friends, 
   onClose, 
-  onSuccess 
+  onSuccess,
+  userId
 }: { 
   friends: Friend[]
   onClose: () => void
-  onSuccess: () => void 
+  onSuccess: () => void
+  userId: string
 }) {
   const [friendId, setFriendId] = useState('')
+  const [newFriendName, setNewFriendName] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isCreatingNew, setIsCreatingNew] = useState(false)
   const supabase = createBrowserClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -609,11 +721,35 @@ function AddPregnancyModal({
     setLoading(true)
 
     try {
+      let finalFriendId = friendId
+
+      // Create new friend if needed
+      if (isCreatingNew && newFriendName.trim()) {
+        const { data: newFriend, error: friendError } = await supabase
+          .from('friends')
+          .insert([{
+            user_id: userId,
+            name: newFriendName,
+            reminder_enabled: true
+          }])
+          .select()
+          .single()
+
+        if (friendError) throw friendError
+        finalFriendId = newFriend.id
+      }
+
+      if (!finalFriendId) {
+        alert('Please select or create a friend')
+        setLoading(false)
+        return
+      }
+
       const { error } = await supabase
         .from('pregnancies')
         .insert([
           {
-            friend_id: friendId,
+            friend_id: finalFriendId,
             due_date: dueDate,
             notes: notes || null,
             baby_born: false
@@ -632,55 +768,90 @@ function AddPregnancyModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Add Pregnancy</h2>
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border-2 border-pink-200 max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl font-black text-gray-900 mb-4">Add Pregnancy 🤰</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Friend *</label>
-            <select
-              value={friendId}
-              onChange={(e) => setFriendId(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-            >
-              <option value="">Select a friend</option>
-              {friends.map(friend => (
-                <option key={friend.id} value={friend.id}>{friend.name}</option>
-              ))}
-            </select>
+            <label className="block text-sm font-bold text-gray-700 mb-2">Friend *</label>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  id="existing"
+                  checked={!isCreatingNew}
+                  onChange={() => setIsCreatingNew(false)}
+                  className="w-4 h-4 text-pink-600"
+                />
+                <label htmlFor="existing" className="text-sm font-medium text-gray-700">Select existing friend</label>
+              </div>
+              {!isCreatingNew && (
+                <select
+                  value={friendId}
+                  onChange={(e) => setFriendId(e.target.value)}
+                  required={!isCreatingNew}
+                  className="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white font-medium"
+                >
+                  <option value="">Select a friend</option>
+                  {friends.map(friend => (
+                    <option key={friend.id} value={friend.id}>{friend.name}</option>
+                  ))}
+                </select>
+              )}
+              
+              <div className="flex items-center gap-2 mt-3">
+                <input
+                  type="radio"
+                  id="new"
+                  checked={isCreatingNew}
+                  onChange={() => setIsCreatingNew(true)}
+                  className="w-4 h-4 text-pink-600"
+                />
+                <label htmlFor="new" className="text-sm font-medium text-gray-700">Create new friend</label>
+              </div>
+              {isCreatingNew && (
+                <input
+                  type="text"
+                  value={newFriendName}
+                  onChange={(e) => setNewFriendName(e.target.value)}
+                  required={isCreatingNew}
+                  placeholder="Friend's name(s)"
+                  className="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white font-medium"
+                />
+              )}
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Due Date *</label>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white font-medium"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Gender, baby name ideas, etc."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white font-medium"
             />
           </div>
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-bold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition-colors disabled:opacity-50 font-bold shadow-md"
             >
               {loading ? 'Adding...' : 'Add Pregnancy'}
             </button>
