@@ -56,8 +56,8 @@ export default function Home() {
               Never forget a birthday again
             </p>
             <p className="text-lg text-gray-500 mb-12 max-w-2xl mx-auto">
-              Keep track of your friends' kids, their birthdays, upcoming parties,
-              and gift ideas all in one place. Get reminders so you're always prepared.
+              Keep track of your friends&apos; kids, their birthdays, upcoming parties,
+              and gift ideas all in one place. Get reminders so you&apos;re always prepared.
             </p>
           </div>
 
@@ -96,21 +96,21 @@ export default function Home() {
               <div className="text-4xl mb-3">🎈</div>
               <h3 className="text-xl font-semibold mb-2">Track Birthdays</h3>
               <p className="text-gray-600">
-                Keep all your friends' kids' birthdays organized in one place
+                Keep all your friends&apos; kids&apos; birthdays organized in one place
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="text-4xl mb-3">🎁</div>
               <h3 className="text-xl font-semibold mb-2">Gift Tracking</h3>
               <p className="text-gray-600">
-                Track what gifts you've purchased and party RSVPs
+                Track what gifts you&apos;ve purchased and party RSVPs
               </p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="text-4xl mb-3">🔔</div>
               <h3 className="text-xl font-semibold mb-2">Smart Reminders</h3>
               <p className="text-gray-600">
-                Get timely reminders so you're never caught off guard
+                Get timely reminders so you&apos;re never caught off guard
               </p>
             </div>
           </div>

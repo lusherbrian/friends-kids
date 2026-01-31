@@ -29,6 +29,7 @@ export default function Dashboard() {
       }
     }
     checkAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, supabase.auth])
 
   const fetchFriends = async (userId: string) => {
