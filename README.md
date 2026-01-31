@@ -114,8 +114,3 @@ For issues or questions, check the setup guide or create an issue on GitHub.
 ---
 
 Built with ❤️ using Next.js, Supabase, and Vercel
-"# friends-kids" 
-"# friends-kids" 
-"# friends-kids" 
-"# friends-kids" 
-"# friends-kids" 
